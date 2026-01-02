@@ -1,0 +1,112 @@
+
+
+<!doctype html>
+<html lang="en" class="dark">
+  <!-- Google Analytics (GA4) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-PEKGW897B2');
+</script>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Habit Tracker</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    .card {
+      background: rgb(15 23 42 / 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1rem;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-950 text-slate-100 transition-colors duration-300">
+
+  <nav class="border-b border-white/10 bg-slate-900/60 backdrop-blur sticky top-0 z-10">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center gap-4">
+      <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+
+      <a href="/" class="font-semibold">Dashboard</a>
+      <a href="/habits" class="opacity-80 hover:opacity-100">Habits</a>
+      <a href="/analytics" class="opacity-80 hover:opacity-100">Analytics</a>
+
+      
+      <button
+        id="themeToggle"
+        class="ml-auto px-3 py-1.5 rounded-lg text-sm border border-white/20 hover:bg-white/10">
+        🌙 Dark
+      </button>
+
+      
+      <a href="{{ url_for('logout') }}"
+         class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm">
+        Logout
+      </a>
+    </div>
+  </nav>
+
+  <main class="max-w-4xl mx-auto px-4 py-6">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="space-y-2 mb-4">
+          {% for category, message in messages %}
+            <div class="px-3 py-2 rounded-lg text-sm font-medium
+              {% if category == 'success' %}
+                bg-green-600 text-white
+              {% elif category == 'error' %}
+                bg-red-600 text-white
+              {% else %}
+                bg-slate-600 text-white
+              {% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  
+  <script>
+    const html = document.documentElement;
+    const btn = document.getElementById("themeToggle");
+
+    function applyTheme(theme) {
+      if (theme === "light") {
+        html.classList.remove("dark");
+        document.body.classList.remove("bg-slate-950", "text-slate-100");
+        document.body.classList.add("bg-slate-100", "text-slate-900");
+        btn.textContent = "☀️ Light";
+      } else {
+        html.classList.add("dark");
+        document.body.classList.remove("bg-slate-100", "text-slate-900");
+        document.body.classList.add("bg-slate-950", "text-slate-100");
+        btn.textContent = "🌙 Dark";
+      }
+    }
+
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    applyTheme(savedTheme);
+
+    btn.addEventListener("click", () => {
+      const newTheme = html.classList.contains("dark") ? "light" : "dark";
+      localStorage.setItem("theme", newTheme);
+      applyTheme(newTheme);
+    });
+  </script>
+
+</body>
+</html>
+

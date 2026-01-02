@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="text-2xl font-semibold mb-4">Today</h1>
+
+<!-- AI HABIT COACH (ADDED - SAFE) -->
+<div class="card p-4 mb-4">
+  <h2 class="font-semibold mb-2">AI Habit Coach 🤖</h2>
+  <p id="aiText" class="text-sm opacity-80 mb-2">
+    Click the button to get AI motivation for your habits.
+  </p>
+  <button
+    id="aiBtn"
+    class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-sm">
+    Get AI Advice
+  </button>
+</div>
+
+<div class="grid gap-4">
+
+{% for habit in habits %}
+<div class="card rounded-2xl p-4">
+
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-3 h-3 rounded-full" style="background: {{ habit.color }}"></div>
+      <div class="font-medium">{{ habit.name }}</div>
+      <span class="text-xs opacity-60">
+        Streak: {{ streaks.get(habit.id, 0) }} 🔥
+      </span>
+    </div>
+
+    {% set checked = (habit.id, today) in check_map %}
+    
+    <button
+      data-hid="{{ habit.id }}"
+      data-date="{{ today.isoformat() }}"
+      class="toggle-today px-3 py-1.5 rounded-lg text-sm border border-white/10
+      {{ 'bg-emerald-500/30' if checked else 'bg-slate-800' }}">
+      {{ 'Done' if checked else 'Mark done' }}
+    </button>
+  </div>
+
+  <div class="mt-3 text-xs opacity-80">This week</div>
+
+  <div class="mt-2 grid grid-cols-7 gap-2">
+    {% for day in days %}
+      {% set on = (habit.id, day) in check_map %}
+      
+      <button
+        data-hid="{{ habit.id }}"
+        data-date="{{ day.isoformat() }}"
+        class="toggle-day h-8 rounded-lg border border-white/10
+        {{ 'bg-emerald-500/30' if on else 'bg-slate-800' }}">
+        {{ day.strftime('%a')[0] }}
+      </button>
+    {% endfor %}
+  </div>
+
+</div>
+{% endfor %}
+
+</div>
+
+<!-- EXISTING TOGGLE SCRIPT (UNCHANGED) -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.toggle-today, .toggle-day').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const habit_id = btn.dataset.hid;
+      const date = btn.dataset.date;
+
+      await axios.post('/toggle', new URLSearchParams({ habit_id, date }));
+
+      window.location.href = window.location.pathname;
+    });
+  });
+});
+</script>
+
+<!-- AI SCRIPT (ADDED - SAFE, SEPARATE) -->
+<script>
+document.getElementById("aiBtn").addEventListener("click", async () => {
+  console.log("AI button clicked"); // DEBUG
+
+  try {
+    const res = await axios.post("/ai-advice", new URLSearchParams({
+      habit: "Daily Habit",
+      streak: "current"
+    }));
+
+    console.log("AI response:", res.data); // DEBUG
+    document.getElementById("aiText").innerText = res.data.advice;
+  } catch (err) {
+    console.error("AI request failed:", err); // DEBUG
+    document.getElementById("aiText").innerText =
+      "AI service unavailable. Please try again.";
+  }
+});
+</script>
+
+
+{% endblock %}
+
+
+
+
